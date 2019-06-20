@@ -23,17 +23,17 @@ forecast_out = int(math.ceil(0.1*len(df)))
 
 df['label']= df[forecast_col].shift(-forecast_out)
 
-x = np.array(df.drop({'label', 'Adj. Close'}, 1))
-x = preprocessing.scale(x)
-x_lately = x[-forecast_out:]
-x = x[:-forecast_out]
+X = np.array(df.drop({'label', 'Adj. Close'}, 1))
+X = preprocessing.scale(X)
+X_lately = X[-forecast_out:]
+X = X[:-forecast_out]
 
 df.dropna(inplace=True)
 y = np.array(df['label'])
-x_train, x_test, y_train, y_test = model_selection.train_test_split(x, y, test_size=0.2)
+X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, test_size=0.2)
 
 clf = LinearRegression(n_jobs=-1)
-clf.fit(x_train, y_train)
+clf.fit(X_train, y_train)
 
 with open('linearregression.pickle', 'wb') as f:
     pickle.dump(clf, f)
@@ -41,8 +41,8 @@ with open('linearregression.pickle', 'wb') as f:
 pickle_in = open('linearregression.pickle', 'rb')
 clf = pickle.load(pickle_in)
 
-accuracy = clf.score(x_test, y_test)
-forecast_set = clf.predict(x_lately)
+accuracy = clf.score(X_test, y_test)
+forecast_set = clf.predict(X_lately)
 print(forecast_set, '\n' ,accuracy,'\n', forecast_out)
 df['Forecast'] = np.nan
 
